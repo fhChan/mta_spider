@@ -54,7 +54,9 @@ class mta_spider(object):
         if zip_list and not os.path.isdir(dir_by_day):
             os.makedirs(dir_by_day)
         for zipfile in zip_list:
-            response = get_respond_text(self.url_base+'/'.join(str_day.split('-'))+'/'+zipfile)
+            response = ''
+            while not response:
+                response = get_respond_text(self.url_base+'/'.join(str_day.split('-'))+'/'+zipfile)
             with open(os.path.join(dir_by_day,zipfile.replace('/','_')),'w') as fh:
                 fh.write(response.read())
         print 'Download completely on '+str_day
@@ -72,12 +74,12 @@ class mta_spider(object):
             str_day = day.strftime("%Y-%m-%d")
             try:
                 response = get_respond_text(self.url_base+day.strftime("%Y/%m/%d"))
-                self.update_info(str_day)
             except urllib2.HTTPError:
                 print 'No file found on '+str_day
                 self.update_info(str_day)
                 continue
             self.download_by_day(str_day,response)
+            self.update_info(str_day)
 
 def main():
     MS = mta_spider()
